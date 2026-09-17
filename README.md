@@ -1,108 +1,120 @@
-# Enterprise Text-to-SQL Copilot
+# 🤖 Enterprise Text-to-SQL Copilot
 
-> **Enterprise SQL Copilot for planned, governed, and explainable text-to-SQL.**
+> Enterprise-grade, schema-grounded, and read-only Text-to-SQL AI Agent built with Google Agent Development Kit (ADK), Vertex AI Agent Engine, Memory Bank, Firestore, and Cloud Storage.
 
-SQL Copilot turns complex business questions into schema-grounded, read-only SQL queries through multi-agent planning, Vertex AI Agent Runtime orchestration, Spider dataset grounding, Firestore governance cataloging, live currency conversions, and public Cloud Storage exports.
-
----
-
-## 🌟 Key Architecture & Features
-
-1. **Multi-Agent Governance & SQL Planning Pipeline**:
-   - **Intent & Schema Validation Agent**: Validates queries against enterprise schema mapping (`clients`, `sales_orders`, `projects`, `customer_profiles`).
-   - **Spider Text-to-SQL Grounding Engine**: Grounded on Spider dataset benchmark (`spider_text_sql.csv`) for complex SQL joins and aggregation patterns.
-   - **Read-Only Safety Guardrail**: Rejects `INSERT`, `UPDATE`, `DELETE`, `DROP`, `ALTER`, or `TRUNCATE` operations before query execution.
-   - **Deterministic Confidence Scoring**: Evaluates schema coverage, join validity, and query safety.
-
-2. **Vertex AI Memory Bank**:
-   - Integrated with Vertex AI Memory Bank for long-term user session history, state preservation, and contextual query recall across turns.
-
-3. **Firestore Database Integration**:
-   - Collection: `schema_requests` on Project `qwiklabs-gcp-02-c95bba962a8e`.
-   - Function tools (`get_pending_schema_requests`, `submit_schema_request`) allow users to query and log schema extension requests.
-
-4. **Cloud Storage Query Artifact Export**:
-   - Function tool (`export_query_to_cloud_storage`) formats and uploads `.sql` query files to public GCS bucket `text-to-sql-copilot-public-c95bba96`.
-
-5. **Financial & Currency Exchange Rates**:
-   - Function tool (`get_currency_exchange_rates`) fetches live European Central Bank exchange rates via Frankfurter API for multi-currency revenue conversions (USD, EUR, GBP, JPY).
-
-6. **Cloud Run Enterprise UI Proxy**:
-   - FastAPI containerized frontend providing an interactive dark-mode workspace with 3 clickable enterprise prompt templates.
+![Enterprise Text-to-SQL Copilot Demo](agent_demo.gif)
 
 ---
 
-## 🚀 Getting Started
+## 🌟 Overview
+
+**Enterprise Text-to-SQL Copilot** transforms natural language business questions into deterministic, schema-aligned, and read-only BigQuery SQL queries. It automates complex enterprise data queries across **CRM, Operations, Finance, HR, Trading, Portfolio, and Custody** domains while enforcing strict AST read-only safety guardrails, confidence scoring, multi-currency conversion, and query export capabilities.
+
+---
+
+## 🏗️ Architecture & Wired Google Cloud Services
+
+The project integrates the following Google Cloud infrastructure and tools:
+
+```
+┌───────────────────────────────┐
+│     FastAPI / Web Studio      │  ◄── Multi-page ERD Flow & XAI Workspace
+└──────────────┬────────────────┘
+               │
+               ▼
+┌───────────────────────────────┐
+│   Vertex AI Agent Engine      │  ◄── Agent Runtime (ADK / Gemini 3.7 Flash)
+└──────┬──────────────┬─────────┘
+       │              │
+       ▼              ▼
+┌───────────────┐  ┌───────────────┐  ┌───────────────────────────────┐
+│  Memory Bank  │  │   Firestore   │  │  Google Cloud Storage (GCS)   │
+│ Persistence   │  │ Schema Catalog│  │ Public Query Asset Export     │
+└───────────────┘  └───────────────┘  └───────────────────────────────┘
+```
+
+### 1. Vertex AI Agent Engine (`ReasoningEngine`)
+- Containerized Agent Runtime hosting Google ADK (`app/agent.py`) powered by Gemini 3.7 Flash.
+- Implements SSE streaming protocol via `:streamQuery` and multi-turn session persistence.
+
+### 2. Vertex AI Memory Bank
+- Uses `PreloadMemoryTool` and `after_agent_callback` (`add_session_to_memory`) to extract and recall user domain preferences, dialect defaults, and custom alias mappings across sessions.
+
+### 3. Google Cloud Firestore
+- Stores full enterprise schema metadata in `schema_catalog` collection (`clients`, `projects`, `invoices`, `payments`, `employees`, `tasks`, `time_logs`, `customer_feedback`, `trades`, `positions`, `custody`).
+- Records schema enhancement proposals in `schema_requests` collection.
+
+### 4. Google Cloud Storage (GCS)
+- Exports validated SQL query assets into public bucket `text-to-sql-copilot-public-c95bba96` as shareable `.sql` files.
+
+---
+
+## 🛠️ Integrated Function Tools
+
+| Tool Name | Type | Description |
+| :--- | :--- | :--- |
+| `get_schema_catalog` | **Firestore Read** | Dynamically loads schema tables, column definitions, primary keys, and foreign keys with domain filtering. |
+| `search_spider_sql_patterns` | **Spider RAG** | Matches natural language queries against Spider Text-to-SQL benchmark examples for syntax structure and reasoning. |
+| `get_currency_exchange_rates` | **Public Financial API** | Calls Frankfurter API for live European Central Bank foreign exchange conversion rates. |
+| `validate_read_only_sql` | **AST Safety Guardrail** | Validates that queries start with `SELECT`/`WITH` and blocks state-modifying keywords (`DROP`, `DELETE`, `UPDATE`, `INSERT`). |
+| `calculate_confidence_score` | **Gating Metric** | Computes 0–100% confidence score and assigns `HIGH`/`MEDIUM`/`LOW` bands based on schema alignment. |
+| `export_query_to_cloud_storage` | **GCS Exporter** | Uploads formatted SQL files to Cloud Storage and generates public download URLs. |
+| `create_schema_request` | **Firestore Write** | Logs user schema proposals or extension requests into Firestore. |
+| `list_schema_requests` | **Firestore Read** | Queries submitted schema requests and governance statuses. |
+
+---
+
+## 💻 Local Setup & Execution
 
 ### Prerequisites
 - Python 3.11+
-- [`uv`](https://github.com/astral-sh/uv) package manager
-- Google Cloud SDK (`gcloud`) initialized with project `qwiklabs-gcp-02-c95bba962a8e`
+- `uv` package manager (`pip install uv`)
+- Node.js 18+ (for running Playwright demo scripts)
 
 ### Installation
-```bash
-# Clone repository
-git clone https://github.com/your-username/text-to-sql-copilot.git
-cd text-to-sql-copilot
 
-# Create virtual environment and sync dependencies
-uv venv
-uv sync
-```
-
-### Running Locally
-
-1. **Test Agent Locally**:
+1. Clone the repository:
    ```bash
-   uv run python app/agent.py
+   git clone https://github.com/shasanksingh/buidlwithgemini-text-to-sql-copilot.git
+   cd buidlwithgemini-text-to-sql-copilot
    ```
 
-2. **Run Frontend Proxy Locally**:
+2. Install dependencies:
    ```bash
-   cd frontend
-   export AGENT_ENGINE_RESOURCE_NAME="projects/1057696110870/locations/us-east1/reasoningEngines/8532795171727736832"
-   python main.py
+   uv sync
    ```
-   Open `http://localhost:8080` in your browser.
+
+3. Seed Firestore collections (Schema Catalog & Spider Patterns):
+   ```bash
+   uv run python scripts/seed_firestore.py
+   ```
+
+4. Launch the local FastAPI enterprise workspace:
+   ```bash
+   uv run python frontend/main.py
+   ```
+
+5. Open your browser and navigate to the port output by the server to access the **Studio**, **ERD Connection Flow**, and **XAI Studio**.
 
 ---
 
-## 🚢 Deployment
+## 📹 Recording UI Demos
 
-### Deploy Agent to Vertex AI Agent Runtime
+Generate an automated screen recording of the agent driving the UI with Playwright and ffmpeg:
+
 ```bash
-agents-cli deploy --target agent_runtime
+node .agents/skills/record-demo/record-agent.js \
+  -q "Find top 5 revenue clients in Q3 2026 joining sales_orders and customer_profiles." \
+  -q "Show active portfolio holdings and total market value by client in positions and custody tables." \
+  --wait 20000 --speed 1.5 -o agent_demo.webm
 ```
 
-### Deploy Frontend Proxy to Cloud Run
+Convert the `.webm` recording to an optimized looping GIF:
 ```bash
-gcloud run deploy text-to-sql-copilot-frontend \
-  --source ./frontend \
-  --region us-east1 \
-  --allow-unauthenticated \
-  --set-env-vars="AGENT_ENGINE_RESOURCE_NAME=projects/1057696110870/locations/us-east1/reasoningEngines/8532795171727736832,AGENT_DIRECTORY=app" \
-  --project=qwiklabs-gcp-02-c95bba962a8e
+ffmpeg -y -i agent_demo.webm -vf "fps=12,scale=720:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 agent_demo.gif
 ```
 
 ---
 
-## 🛠 Project Structure
-
-```
-text-to-sql-copilot/
-├── app/
-│   └── agent.py                  # Vertex AI Agent definition & function tools
-├── frontend/
-│   ├── main.py                   # FastAPI proxy server
-│   ├── requirements.txt          # Frontend dependencies
-│   ├── Dockerfile                # Cloud Run container definition
-│   └── static/
-│       └── index.html            # Enterprise SQL Copilot chat interface
-├── data/
-│   └── spider_text_sql.csv       # Spider dataset benchmark grounding
-├── scripts/
-│   └── seed_firestore.py         # Seed script for Firestore schema_requests
-├── agents-cli-manifest.yaml     # Agents CLI project deployment manifest
-├── pyproject.toml               # Python package configuration
-└── README.md                    # Project documentation
-```
+## 📜 License
+Apache License 2.0

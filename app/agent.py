@@ -142,6 +142,51 @@ FULL_ENTERPRISE_SCHEMA = [
             {"name": "comments", "type": "STRING", "key": "NONE", "description": "User feedback comments"},
         ],
     },
+    {
+        "table_name": "trades",
+        "domain": "Trading",
+        "description": "Institutional trade execution logs and transaction records",
+        "primary_key": "trade_id",
+        "columns": [
+            {"name": "trade_id", "type": "STRING", "key": "PRIMARY_KEY", "description": "Unique trade execution identifier"},
+            {"name": "client_id", "type": "STRING", "key": "FOREIGN_KEY", "references": "clients.client_id", "description": "Associated institutional client ID"},
+            {"name": "asset_symbol", "type": "STRING", "key": "NONE", "description": "Asset ticker or instrument symbol (e.g. AAPL, GOOGL, BTC)"},
+            {"name": "side", "type": "STRING", "key": "NONE", "description": "Trade side (BUY, SELL)"},
+            {"name": "quantity", "type": "NUMERIC", "key": "NONE", "description": "Executed share or unit quantity"},
+            {"name": "price", "type": "NUMERIC", "key": "NONE", "description": "Execution price per unit in USD"},
+            {"name": "trade_timestamp", "type": "TIMESTAMP", "key": "NONE", "description": "Execution timestamp"},
+        ],
+    },
+    {
+        "table_name": "positions",
+        "domain": "Portfolio",
+        "description": "Active portfolio asset holdings and unrealized P&L snapshots",
+        "primary_key": "position_id",
+        "columns": [
+            {"name": "position_id", "type": "STRING", "key": "PRIMARY_KEY", "description": "Unique position snapshot ID"},
+            {"name": "client_id", "type": "STRING", "key": "FOREIGN_KEY", "references": "clients.client_id", "description": "Portfolio owner client ID"},
+            {"name": "asset_symbol", "type": "STRING", "key": "NONE", "description": "Held asset ticker symbol"},
+            {"name": "quantity", "type": "NUMERIC", "key": "NONE", "description": "Total position quantity held"},
+            {"name": "average_entry_price", "type": "NUMERIC", "key": "NONE", "description": "Weighted average entry price"},
+            {"name": "current_market_value", "type": "NUMERIC", "key": "NONE", "description": "Current total market value in USD"},
+            {"name": "unrealized_pnl", "type": "NUMERIC", "key": "NONE", "description": "Unrealized profit and loss in USD"},
+        ],
+    },
+    {
+        "table_name": "custody",
+        "domain": "Custody",
+        "description": "Safekeeping accounts, custodian bank allocations, and asset reserves",
+        "primary_key": "custody_account_id",
+        "columns": [
+            {"name": "custody_account_id", "type": "STRING", "key": "PRIMARY_KEY", "description": "Unique custody account ID"},
+            {"name": "client_id", "type": "STRING", "key": "FOREIGN_KEY", "references": "clients.client_id", "description": "Beneficial owner client ID"},
+            {"name": "custodian_bank", "type": "STRING", "key": "NONE", "description": "Custodian institution (e.g., BNY Mellon, State Street, JPMorgan)"},
+            {"name": "safekeeping_account_no", "type": "STRING", "key": "NONE", "description": "Official safekeeping account number"},
+            {"name": "held_asset_type", "type": "STRING", "key": "NONE", "description": "Category of assets held (Equities, Fixed Income, Cash, Crypto)"},
+            {"name": "total_custody_value_usd", "type": "NUMERIC", "key": "NONE", "description": "Total asset valuation under custody in USD"},
+            {"name": "status", "type": "STRING", "key": "NONE", "description": "Account operational status (ACTIVE, FROZEN, AUDIT)"},
+        ],
+    },
 ]
 
 

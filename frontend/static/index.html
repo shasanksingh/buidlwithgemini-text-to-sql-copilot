@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enterprise Text-to-SQL Copilot</title>
+  <title>Enterprise Text-to-SQL Copilot Workspace</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -40,7 +40,7 @@
     /* Header */
     header {
       background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 100%);
-      padding: 16px 28px;
+      padding: 14px 28px;
       border-bottom: 1px solid var(--border-color);
       display: flex;
       align-items: center;
@@ -81,6 +81,36 @@
       color: var(--text-muted);
     }
 
+    /* Navigation Tabs */
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(17, 24, 39, 0.8);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid var(--border-color);
+    }
+
+    .nav-tab {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-tab.active {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+    }
+
     .header-status {
       display: flex;
       align-items: center;
@@ -101,19 +131,32 @@
       box-shadow: 0 0 8px var(--success-green);
     }
 
-    /* Main Container */
+    /* Main Container & Page Views */
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
-      max-width: 1000px;
+      max-width: 1200px;
       width: 100%;
       margin: 0 auto;
       padding: 20px;
       height: calc(100vh - 70px);
+      overflow: hidden;
     }
 
-    /* Chat Dialogue Window */
+    .page-view {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+    }
+
+    .page-view.active {
+      display: flex;
+    }
+
+    /* Chat View */
     .chat-container {
       flex: 1;
       background: var(--panel-bg);
@@ -171,7 +214,6 @@
       gap: 6px;
     }
 
-    /* Code Blocks */
     pre {
       background: #090d16;
       border: 1px solid rgba(59, 130, 246, 0.3);
@@ -192,7 +234,6 @@
       color: #38bdf8;
     }
 
-    /* Prompts Row */
     .suggested-prompts {
       margin-top: 14px;
       display: grid;
@@ -221,7 +262,6 @@
       transform: translateY(-2px);
     }
 
-    /* Input Controls */
     .input-area {
       margin-top: 12px;
       display: flex;
@@ -259,6 +299,144 @@
     .input-area button:hover {
       opacity: 0.9;
     }
+
+    /* Diagram & XAI Page Styles */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .diagram-container {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .erd-flow {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      position: relative;
+      padding: 20px 0;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .table-node {
+      background: linear-gradient(145deg, #1e293b, #0f172a);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      border-radius: 10px;
+      padding: 14px 18px;
+      min-width: 180px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      transition: all 0.25s ease;
+    }
+
+    .table-node:hover {
+      border-color: var(--accent-cyan);
+      transform: scale(1.03);
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
+    }
+
+    .node-header {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #38bdf8;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .node-tag {
+      font-size: 0.65rem;
+      background: rgba(124, 58, 237, 0.3);
+      color: #c084fc;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .node-fields {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pk { color: #f59e0b; }
+    .fk { color: #a78bfa; }
+
+    .connector-line {
+      font-size: 1.5rem;
+      color: var(--accent-cyan);
+      font-weight: 700;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .xai-card {
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      background: rgba(30, 41, 59, 0.5);
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 3px solid var(--accent-blue);
+    }
+
+    .step-badge {
+      background: var(--accent-blue);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.75rem;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-content h4 {
+      font-size: 0.85rem;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .step-content p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
   </style>
 </head>
 <body>
@@ -266,10 +444,24 @@
     <div class="header-brand">
       <div class="brand-icon">SQL</div>
       <div class="brand-title">
-        <h1>Enterprise Text-to-SQL Copilot</h1>
-        <p>Vertex AI Agent Engine • Firestore • Spider RAG • Cloud Storage</p>
+        <h1>Enterprise Text-to-SQL Copilot Workspace</h1>
+        <p>Vertex AI Agent Engine • Firestore Catalog • Spider RAG • XAI Lineage</p>
       </div>
     </div>
+
+    <!-- Multi-Page Navigation Tabs -->
+    <div class="nav-tabs">
+      <div class="nav-tab active" onclick="switchPage('chatPage', this)">
+        <span>💬</span> Studio
+      </div>
+      <div class="nav-tab" onclick="switchPage('schemaPage', this)">
+        <span>🗺️</span> ERD Connection Flow
+      </div>
+      <div class="nav-tab" onclick="switchPage('xaiPage', this)">
+        <span>💡</span> XAI & Lineage
+      </div>
+    </div>
+
     <div class="header-status">
       <div class="status-dot"></div>
       <span>Agent Runtime Active</span>
@@ -277,34 +469,193 @@
   </header>
 
   <main>
-    <div class="chat-container" id="chatContainer">
-      <div class="message agent">
-        <div class="message-header">🤖 Enterprise SQL Copilot</div>
-        Welcome! Ask any business question in natural language. I will ground it against enterprise schema catalog, Spider RAG patterns, validate read-only SQL, compute confidence scores, convert currencies, and export query files to Cloud Storage.
+    <!-- PAGE 1: CHAT STUDIO -->
+    <div class="page-view active" id="chatPage">
+      <div class="chat-container" id="chatContainer">
+        <div class="message agent">
+          <div class="message-header">🤖 Enterprise SQL Copilot</div>
+          Welcome! Ask any business question in natural language. I will ground it against enterprise schema catalog, Spider RAG patterns, validate read-only SQL, compute confidence scores, convert currencies, and export query files to Cloud Storage.
+        </div>
+      </div>
+
+      <div class="suggested-prompts">
+        <div class="prompt-card" onclick="sendPrompt('Find top 5 revenue clients in Q3 2026 joining sales_orders and customer_profiles.')">
+          <span>📈</span> Top 5 Revenue Clients (Q3 2026)
+        </div>
+        <div class="prompt-card" onclick="sendPrompt('Show active portfolio holdings and total market value by client in positions and custody tables.')">
+          <span>📊</span> Portfolio & Custody Holdings
+        </div>
+        <div class="prompt-card" onclick="sendPrompt('Check USD to EUR rate and compute total billing by client in EUR.')">
+          <span>💱</span> USD/EUR FX Rates & Billing
+        </div>
+      </div>
+
+      <div class="input-area">
+        <input type="text" id="userInput" placeholder="Ask a business question in natural language (e.g. trading, positions, custody, CRM, finance)..." onkeydown="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()">Send</button>
       </div>
     </div>
 
-    <!-- 3 Clickable Example Prompts -->
-    <div class="suggested-prompts">
-      <div class="prompt-card" onclick="sendPrompt('Find top 5 revenue clients in Q3 2026 joining sales_orders and customer_profiles.')">
-        <span>📈</span> Top 5 Revenue Clients in Q3 2026
+    <!-- PAGE 2: INTERACTIVE ERD SCHEMA CONNECTION FLOW -->
+    <div class="page-view" id="schemaPage">
+      <div class="section-title">
+        <span>🗺️</span> Enterprise Relational Schema Connection Flow (Firestore Catalog)
       </div>
-      <div class="prompt-card" onclick="sendPrompt('Check USD to EUR rate and compute total billing by client in EUR.')">
-        <span>💱</span> USD to EUR Rates & Billing Conversion
-      </div>
-      <div class="prompt-card" onclick="sendPrompt('Generate total billing by client query and export it to Cloud Storage.')">
-        <span>☁️</span> Generate SQL & Export to Cloud Storage
+
+      <div class="diagram-container">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 16px;">
+          The Text-to-SQL Copilot dynamically retrieves relational paths across CRM, Operations, Finance, Trading, Portfolio, and Custody domains.
+        </p>
+
+        <!-- CRM & Finance Flow -->
+        <h4 style="font-size: 0.85rem; color: var(--accent-cyan); margin-bottom: 10px;">1. CRM, Operations & Financial Settlement Flow</h4>
+        <div class="erd-flow">
+          <div class="table-node">
+            <div class="node-header">
+              <span>clients</span>
+              <span class="node-tag">CRM</span>
+            </div>
+            <div class="node-fields">
+              <div><span class="pk">🔑 client_id</span> STRING</div>
+              <div>name STRING</div>
+              <div>tier STRING</div>
+            </div>
+          </div>
+          <div class="connector-line">➔</div>
+          <div class="table-node">
+            <div class="node-header">
+              <span>projects</span>
+              <span class="node-tag">Operations</span>
+            </div>
+            <div class="node-fields">
+              <div><span class="pk">🔑 project_id</span> STRING</div>
+              <div><span class="fk">🔗 client_id</span> STRING</div>
+              <div>budget NUMERIC</div>
+            </div>
+          </div>
+          <div class="connector-line">➔</div>
+          <div class="table-node">
+            <div class="node-header">
+              <span>invoices</span>
+              <span class="node-tag">Finance</span>
+            </div>
+            <div class="node-fields">
+              <div><span class="pk">🔑 invoice_id</span> STRING</div>
+              <div><span class="fk">🔗 project_id</span> STRING</div>
+              <div>amount NUMERIC</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trading & Custody Flow -->
+        <h4 style="font-size: 0.85rem; color: #a78bfa; margin-top: 20px; margin-bottom: 10px;">2. Capital Markets, Trading & Custody Safekeeping Flow</h4>
+        <div class="erd-flow">
+          <div class="table-node">
+            <div class="node-header">
+              <span>trades</span>
+              <span class="node-tag">Trading</span>
+            </div>
+            <div class="node-fields">
+              <div><span class="pk">🔑 trade_id</span> STRING</div>
+              <div><span class="fk">🔗 client_id</span> STRING</div>
+              <div>asset_symbol STRING</div>
+              <div>quantity NUMERIC</div>
+            </div>
+          </div>
+          <div class="connector-line">➔</div>
+          <div class="table-node">
+            <div class="node-header">
+              <span>positions</span>
+              <span class="node-tag">Portfolio</span>
+            </div>
+            <div class="node-fields">
+              <div><span class="pk">🔑 position_id</span> STRING</div>
+              <div><span class="fk">🔗 client_id</span> STRING</div>
+              <div>market_value NUMERIC</div>
+              <div>unrealized_pnl NUMERIC</div>
+            </div>
+          </div>
+          <div class="connector-line">➔</div>
+          <div class="table-node">
+            <div class="node-header">
+              <span>custody</span>
+              <span class="node-tag">Custody</span>
+            </div>
+            <div class="node-fields">
+              <div><span class="pk">🔑 custody_id</span> STRING</div>
+              <div><span class="fk">🔗 client_id</span> STRING</div>
+              <div>custodian_bank STRING</div>
+              <div>total_custody_val NUMERIC</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Ask a business question in natural language..." onkeydown="if(event.key==='Enter') sendMessage()">
-      <button onclick="sendMessage()">Send</button>
+    <!-- PAGE 3: EXPLAINABLE AI (XAI) & GOVERNANCE STUDIO -->
+    <div class="page-view" id="xaiPage">
+      <div class="section-title">
+        <span>💡</span> Explainable AI (XAI) & Query Lineage Studio
+      </div>
+
+      <div class="grid-2">
+        <div class="xai-card">
+          <h3 style="font-size: 0.95rem; color: #fff; margin-bottom: 12px;">Deterministic Planning Pipeline</h3>
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-badge">1</div>
+              <div class="step-content">
+                <h4>Schema Grounding (`get_schema_catalog`)</h4>
+                <p>Fetches verified table schemas, primary keys, and foreign keys from Firestore.</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-badge">2</div>
+              <div class="step-content">
+                <h4>Pattern Retrieval (`search_spider_sql_patterns`)</h4>
+                <p>Retrieves Spider Text-to-SQL benchmark templates for syntax accuracy.</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-badge">3</div>
+              <div class="step-content">
+                <h4>AST Read-Only Guardrail (`validate_read_only_sql`)</h4>
+                <p>Scans generated SQL for state-modifying keywords (DROP, DELETE, UPDATE) to enforce read-only safety.</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-badge">4</div>
+              <div class="step-content">
+                <h4>Confidence Gating (`calculate_confidence_score`)</h4>
+                <p>Computes 0-100% confidence metric based on join accuracy and safety checks.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="xai-card">
+          <h3 style="font-size: 0.95rem; color: #fff; margin-bottom: 12px;">Enterprise Governance & Asset Export</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
+            Queries are automatically assigned a safety status (<code>PASSED_READ_ONLY</code>) and confidence score before execution. Validated queries can be exported to public Cloud Storage buckets as shareable <code>.sql</code> files.
+          </p>
+          <div style="background: rgba(17, 24, 39, 0.8); border: 1px solid rgba(59, 130, 246, 0.3); padding: 14px; border-radius: 8px;">
+            <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: 600; margin-bottom: 6px;">GCS Asset Export Target</div>
+            <div style="font-family: 'Fira Code', monospace; font-size: 0.75rem; color: #93c5fd;">gs://text-to-sql-copilot-public-c95bba96/queries/*.sql</div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
   <script>
     let currentSessionId = null;
+
+    function switchPage(pageId, tabEl) {
+      document.querySelectorAll('.page-view').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      tabEl.classList.add('active');
+    }
 
     async function sendMessage() {
       const inputEl = document.getElementById('userInput');
@@ -366,7 +717,6 @@
 
     function formatMarkdown(text) {
       if (typeof text !== 'string') text = JSON.stringify(text, null, 2);
-      // Basic markdown code blocks
       text = text.replace(/```sql([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
       text = text.replace(/```json([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
       text = text.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
