@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Text-to-SQL Copilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --panel-bg: #111827;
+      --card-bg: rgba(31, 41, 55, 0.7);
+      --accent-blue: #2563eb;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #7c3aed;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border-color: rgba(75, 85, 99, 0.4);
+      --success-green: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(90deg, #0f172a 0%, #1e1b4b 100%);
+      padding: 16px 28px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      font-size: 18px;
+      box-shadow: 0 0 12px rgba(6, 182, 212, 0.4);
+    }
+
+    .brand-title h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #ffffff, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-title p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .header-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      padding: 6px 14px;
+      border-radius: 20px;
+      color: var(--success-green);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--success-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--success-green);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px;
+      height: calc(100vh - 70px);
+    }
+
+    /* Chat Dialogue Window */
+    .chat-container {
+      flex: 1;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
+    }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      max-width: 85%;
+      line-height: 1.5;
+      font-size: 0.95rem;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #1d4ed8, #2563eb);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 16px 16px 2px 16px;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .message.agent {
+      align-self: flex-start;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 16px 20px;
+      border-radius: 16px 16px 16px 2px;
+      backdrop-filter: blur(8px);
+      width: 100%;
+    }
+
+    .message-header {
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Code Blocks */
+    pre {
+      background: #090d16;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 14px;
+      border-radius: 8px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: #93c5fd;
+      overflow-x: auto;
+      margin: 10px 0;
+    }
+
+    code {
+      font-family: 'Fira Code', monospace;
+      background: rgba(30, 41, 59, 0.6);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #38bdf8;
+    }
+
+    /* Prompts Row */
+    .suggested-prompts {
+      margin-top: 14px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .prompt-card {
+      background: rgba(17, 24, 39, 0.8);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .prompt-card:hover {
+      background: rgba(37, 99, 235, 0.2);
+      border-color: var(--accent-cyan);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    /* Input Controls */
+    .input-area {
+      margin-top: 12px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-area input {
+      flex: 1;
+      background: var(--panel-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: #fff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-area input:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.3);
+    }
+
+    .input-area button {
+      background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 0 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .input-area button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-brand">
+      <div class="brand-icon">SQL</div>
+      <div class="brand-title">
+        <h1>Enterprise Text-to-SQL Copilot</h1>
+        <p>Vertex AI Agent Engine • Firestore • Spider RAG • Cloud Storage</p>
+      </div>
+    </div>
+    <div class="header-status">
+      <div class="status-dot"></div>
+      <span>Agent Runtime Active</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="chat-container" id="chatContainer">
+      <div class="message agent">
+        <div class="message-header">🤖 Enterprise SQL Copilot</div>
+        Welcome! Ask any business question in natural language. I will ground it against enterprise schema catalog, Spider RAG patterns, validate read-only SQL, compute confidence scores, convert currencies, and export query files to Cloud Storage.
+      </div>
+    </div>
+
+    <!-- 3 Clickable Example Prompts -->
+    <div class="suggested-prompts">
+      <div class="prompt-card" onclick="sendPrompt('Find top 5 revenue clients in Q3 2026 joining sales_orders and customer_profiles.')">
+        <span>📈</span> Top 5 Revenue Clients in Q3 2026
+      </div>
+      <div class="prompt-card" onclick="sendPrompt('Check USD to EUR rate and compute total billing by client in EUR.')">
+        <span>💱</span> USD to EUR Rates & Billing Conversion
+      </div>
+      <div class="prompt-card" onclick="sendPrompt('Generate total billing by client query and export it to Cloud Storage.')">
+        <span>☁️</span> Generate SQL & Export to Cloud Storage
+      </div>
+    </div>
+
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Ask a business question in natural language..." onkeydown="if(event.key==='Enter') sendMessage()">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </main>
+
+  <script>
+    async function sendMessage() {
+      const inputEl = document.getElementById('userInput');
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      inputEl.value = '';
+      appendMessage('user', text);
+      
+      const loadingId = appendMessage('agent', '⚡ *Reasoning engine processing query...*');
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await response.json();
+        
+        removeMessage(loadingId);
+        appendMessage('agent', formatMarkdown(data.output || 'No response output from agent.'));
+      } catch (err) {
+        removeMessage(loadingId);
+        appendMessage('agent', '❌ Connection error contacting Agent Runtime backend.');
+      }
+    }
+
+    function sendPrompt(text) {
+      document.getElementById('userInput').value = text;
+      sendMessage();
+    }
+
+    function appendMessage(role, text) {
+      const container = document.getElementById('chatContainer');
+      const msgDiv = document.createElement('div');
+      const msgId = 'msg-' + Date.now();
+      msgDiv.id = msgId;
+      msgDiv.className = `message ${role}`;
+      
+      if (role === 'agent') {
+        msgDiv.innerHTML = `<div class="message-header">🤖 Enterprise SQL Copilot</div><div>${text}</div>`;
+      } else {
+        msgDiv.innerText = text;
+      }
+      
+      container.appendChild(msgDiv);
+      container.scrollTop = container.scrollHeight;
+      return msgId;
+    }
+
+    function removeMessage(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
+
+    function formatMarkdown(text) {
+      if (typeof text !== 'string') text = JSON.stringify(text, null, 2);
+      // Basic markdown code blocks
+      text = text.replace(/```sql([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+      text = text.replace(/```json([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+      text = text.replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>');
+      text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+      text = text.replace(/\n/g, '<br>');
+      return text;
+    }
+  </script>
+</body>
+</html>
