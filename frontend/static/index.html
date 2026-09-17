@@ -304,6 +304,8 @@
   </main>
 
   <script>
+    let currentSessionId = null;
+
     async function sendMessage() {
       const inputEl = document.getElementById('userInput');
       const text = inputEl.value.trim();
@@ -318,10 +320,14 @@
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text })
+          body: JSON.stringify({ message: text, session_id: currentSessionId })
         });
         const data = await response.json();
         
+        if (data.session_id) {
+          currentSessionId = data.session_id;
+        }
+
         removeMessage(loadingId);
         appendMessage('agent', formatMarkdown(data.output || 'No response output from agent.'));
       } catch (err) {
